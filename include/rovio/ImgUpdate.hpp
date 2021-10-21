@@ -661,7 +661,7 @@ public:
       if (doFrameVisualisation_)
       {
         //ORIGINAL
-        //cvtColor(meas.aux().pyr_[i].imgs_[0], filterState.img_[i], CV_GRAY2RGB);
+        //cvtColor(meas.aux().pyr_[i].imgs_[0], filterState.img_[i], cv::COLOR_GRAY2RGB);
 
         //CUSTOMIZATION
         //Check if image needs to be normalized for display purposes
@@ -673,7 +673,7 @@ public:
         else
           meas.aux().pyr_[i].imgs_[0].convertTo(tmpImg, CV_8UC1);
         //Convert Image to color for drawing purposes
-        cvtColor(tmpImg, filterState.img_[i], CV_GRAY2RGB);
+        cvtColor(tmpImg, filterState.img_[i], cv::COLOR_GRAY2RGB);
         //CUSTOMIZATION
       }
     }

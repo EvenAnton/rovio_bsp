@@ -1139,12 +1139,12 @@ public:
     cv::Mat cv_img;
     if (cv_ptr->encoding == "bgr8")
     {
-      cv::cvtColor(cv_ptr->image, cv_img, CV_BGR2GRAY);
+      cv::cvtColor(cv_ptr->image, cv_img, cv::COLOR_BGR2GRAY);
       cv_img.convertTo(cv_img, CV_32FC1);
     }
     else if (cv_ptr->encoding == "rgb8")
     {
-      cv::cvtColor(cv_ptr->image, cv_img, CV_RGB2GRAY);
+      cv::cvtColor(cv_ptr->image, cv_img, cv::COLOR_RGB2GRAY);
       cv_img.convertTo(cv_img, CV_32FC1);
     }
     else
