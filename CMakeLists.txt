@@ -13,6 +13,7 @@ add_definitions(-DROVIO_PATCHSIZE=${ROVIO_PATCHSIZE})
 add_definitions(-DROVIO_NPOSE=${ROVIO_NPOSE})
 
 add_subdirectory(lightweight_filtering)
+add_subdirectory(FAST-16bit-Corner-Detector)
 
 ##################### Find, include, and compile library #####################
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
@@ -78,7 +79,7 @@ find_package(catkin REQUIRED COMPONENTS
 	eigen_conversions	#BSP_extra
 	octomap_ros		#BSP_extra
 	octomap_msgs		#BSP_extra
-        bsp_msgs		#BSP_extra
+	bsp_msgs		#BSP_extra
 )
 
 add_service_files(
@@ -116,6 +117,7 @@ catkin_package(
 	octomap_ros		#BSP_extra
 	octomap_msgs		#BSP_extra
 	bsp_msgs		#BSP_extra
+	FAST-16bit
 )
 
 include_directories(include ${catkin_INCLUDE_DIRS} ${YamlCpp_INCLUDE_DIRS})

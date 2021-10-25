@@ -1,3 +1,6 @@
 [submodule "lightweight_filtering"]
 	path = lightweight_filtering
 	url = https://github.com/unr-arl/lightweight_filtering_bsp
+[submodule "FAST-16bit-Corner-Detector"]
+	path = FAST-16bit-Corner-Detector
+	url = git@github.com:EvenAnton/FAST-16bit-Corner-Detector.git

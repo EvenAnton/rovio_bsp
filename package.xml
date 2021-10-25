@@ -37,4 +37,6 @@
   <depend>bsp_msgs</depend>
   <depend>tf_conversions</depend>
 
+  <depend>FAST-16bit</depend>
+
 </package>
