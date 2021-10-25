@@ -33,6 +33,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include "rovio/FeatureCoordinates.hpp"
+#include "fast16bit/fast.hpp"
 
 namespace rovio
 {
@@ -153,21 +154,25 @@ public:
     std::vector<cv::KeyPoint> keypoints;
 
     //CUSTOMIZATION
-    //If image is 16-bit it is histrogram equalized and then converted to 8-bit for FAST, otherwise if 8-bit image range convert from float to 8-bit
-    cv::Mat histEqualizedLevelImg;
-    if (applyHistogramEqualization)
-      equalizeHistogram(l, histEqualizedLevelImg);
-    else
-      imgs_[l].convertTo(histEqualizedLevelImg, CV_8UC1); //smk: needed as original input image is saved as float now, which is not accepted by FAST detector 
-    //CUSTOMIZATION
+    fast_16bit_corner_detector feature_detector(detectionThreshold);
+    keypoints = feature_detector.detect(imgs_[l]);
 
-#if (CV_MAJOR_VERSION < 3)
-    cv::FastFeatureDetector feature_detector_fast(detectionThreshold, true);
-    feature_detector_fast.detect(histEqualizedLevelImg, keypoints); //CUSTOMIZATION
-#else
-    auto feature_detector_fast = cv::FastFeatureDetector::create(detectionThreshold, true);
-    feature_detector_fast->detect(histEqualizedLevelImg, keypoints); //CUSTOMIZATION
-#endif
+//     //CUSTOMIZATION
+//     //If image is 16-bit it is histrogram equalized and then converted to 8-bit for FAST, otherwise if 8-bit image range convert from float to 8-bit
+//     cv::Mat histEqualizedLevelImg;
+//     if (applyHistogramEqualization)
+//       equalizeHistogram(l, histEqualizedLevelImg);
+//     else
+//       imgs_[l].convertTo(histEqualizedLevelImg, CV_8UC1); //smk: needed as original input image is saved as float now, which is not accepted by FAST detector 
+//     //CUSTOMIZATION
+
+// #if (CV_MAJOR_VERSION < 3)
+//     cv::FastFeatureDetector feature_detector_fast(detectionThreshold, true);
+//     feature_detector_fast.detect(histEqualizedLevelImg, keypoints); //CUSTOMIZATION
+// #else
+//     auto feature_detector_fast = cv::FastFeatureDetector::create(detectionThreshold, true);
+//     feature_detector_fast->detect(histEqualizedLevelImg, keypoints); //CUSTOMIZATION
+// #endif
 
     //Transform features between levels
     FeatureCoordinates c;
