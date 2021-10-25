@@ -211,6 +211,7 @@ public:
   double startDetectionTh_;
   int nDetectionBuckets_;
   int fastDetectionThreshold_;
+  bool use16bitFastDetection_; /**<Use customized 16bit FAST detector*/
   double scoreDetectionExponent_;
   double penaltyDistance_;
   double zeroDistancePenalty_;
@@ -360,6 +361,7 @@ public:
     intRegister_.registerScalar("nDetectionBuckets", nDetectionBuckets_);
     intRegister_.registerScalar("MotionDetection.minFeatureCountForNoMotionDetection", minFeatureCountForNoMotionDetection_);
     intRegister_.registerScalar("alignMaxUniSample", alignMaxUniSample_);
+    boolRegister_.registerScalar("use16bitFastDetection", use16bitFastDetection_);
     boolRegister_.registerScalar("MotionDetection.isEnabled", doVisualMotionDetection_);
     boolRegister_.registerScalar("useDirectMethod", useDirectMethod_);
     boolRegister_.registerScalar("doFrameVisualisation", doFrameVisualisation_);
@@ -1189,19 +1191,23 @@ public:
         candidates_.clear();
 
         //CUSTOMIZATION
-        //Histogram Equalization should only applied be if image is in 16-bit range
-        bool applyHistogramEqualization = false;
-        double imgMin, imgMax;
-        cv::minMaxLoc(meas.aux().pyr_[camID].imgs_[startLevel_], &imgMin, &imgMax);
-        if (imgMax > 255.0)
-          applyHistogramEqualization = true;
-        if (verbose_)
-          std::cout << "Image Min/Max:" << imgMin << "/" << imgMax << "\t applyHistogramEqualization=" << applyHistogramEqualization << std::endl;
-
+        DetectionImplementation implementation = FAST16bit;
+        if (!use16bitFastDetection_)
+        {
+          //Histogram Equalization should only applied be if image is in 16-bit range
+          double imgMin, imgMax;
+          cv::minMaxLoc(meas.aux().pyr_[camID].imgs_[startLevel_], &imgMin, &imgMax);
+          if (imgMax > 255.0)
+            implementation = HISTOGRAM_EQUALIZATION;
+          else
+            implementation = FAST8bit;
+          // if (verbose_)
+          //   std::cout << "Image Min/Max:" << imgMin << "/" << imgMax << "\t applyHistogramEqualization=" << applyHistogramEqualization << std::endl;
+        }
         //Detect FAST corners, equalize image if 16-bit before application of OpenCV FAST detector
         for (int l = endLevel_; l <= startLevel_; l++)
         {
-          meas.aux().pyr_[camID].detectFastCorners(candidates_, l, fastDetectionThreshold_, applyHistogramEqualization);
+          meas.aux().pyr_[camID].detectFastCorners(candidates_, l, fastDetectionThreshold_, implementation);
         }
         //CUSTOMIZATION
 

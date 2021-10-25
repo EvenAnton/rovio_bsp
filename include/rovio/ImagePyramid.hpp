@@ -37,6 +37,7 @@
 
 namespace rovio
 {
+  enum DetectionImplementation {FAST8bit, FAST16bit, HISTOGRAM_EQUALIZATION};
 
 /** \brief Halfsamples an image.
  *
@@ -148,32 +149,36 @@ public:
    *                             See http://docs.opencv.org/trunk/df/d74/classcv_1_1FastFeatureDetector.html
    */
   //void detectFastCorners(std::vector<FeatureCoordinates>& candidates, int l, int detectionThreshold) const{
-  void detectFastCorners(FeatureCoordinatesVec &candidates, int l, int detectionThreshold, bool applyHistogramEqualization = false) const
+  void detectFastCorners(FeatureCoordinatesVec &candidates, int l, int detectionThreshold, DetectionImplementation detection_implementation= FAST8bit) const
   {
     //Eigen std::vector allocator fix
     std::vector<cv::KeyPoint> keypoints;
 
     //CUSTOMIZATION
-    fast_16bit_corner_detector feature_detector(detectionThreshold);
-    keypoints = feature_detector.detect(imgs_[l]);
-
-//     //CUSTOMIZATION
-//     //If image is 16-bit it is histrogram equalized and then converted to 8-bit for FAST, otherwise if 8-bit image range convert from float to 8-bit
-//     cv::Mat histEqualizedLevelImg;
-//     if (applyHistogramEqualization)
-//       equalizeHistogram(l, histEqualizedLevelImg);
-//     else
-//       imgs_[l].convertTo(histEqualizedLevelImg, CV_8UC1); //smk: needed as original input image is saved as float now, which is not accepted by FAST detector 
-//     //CUSTOMIZATION
-
-// #if (CV_MAJOR_VERSION < 3)
-//     cv::FastFeatureDetector feature_detector_fast(detectionThreshold, true);
-//     feature_detector_fast.detect(histEqualizedLevelImg, keypoints); //CUSTOMIZATION
-// #else
-//     auto feature_detector_fast = cv::FastFeatureDetector::create(detectionThreshold, true);
-//     feature_detector_fast->detect(histEqualizedLevelImg, keypoints); //CUSTOMIZATION
-// #endif
-
+    if (detection_implementation == FAST16bit) 
+    {
+      fast_16bit_corner_detector feature_detector(detectionThreshold);
+      keypoints = feature_detector.detect(imgs_[l]);
+    } 
+    else 
+    {
+      //If image is 16-bit it is histrogram equalized and then converted to 8-bit for FAST, otherwise if 8-bit image range convert from float to 8-bit
+      cv::Mat histEqualizedLevelImg;
+      if (detection_implementation == HISTOGRAM_EQUALIZATION)
+        equalizeHistogram(l, histEqualizedLevelImg);
+      else
+        imgs_[l].convertTo(histEqualizedLevelImg, CV_8UC1); //smk: needed as original input image is saved as float now, which is not accepted by FAST detector 
+    
+      #if (CV_MAJOR_VERSION < 3)
+          cv::FastFeatureDetector feature_detector_fast(detectionThreshold, true);
+          feature_detector_fast.detect(histEqualizedLevelImg, keypoints); //CUSTOMIZATION
+      #else
+          auto feature_detector_fast = cv::FastFeatureDetector::create(detectionThreshold, true);
+          feature_detector_fast->detect(histEqualizedLevelImg, keypoints); //CUSTOMIZATION
+      #endif
+    }
+    //CUSTOMIZATION
+    
     //Transform features between levels
     FeatureCoordinates c;
     candidates.reserve(candidates.size() + keypoints.size());

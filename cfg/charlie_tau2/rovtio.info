@@ -116,6 +116,7 @@ ImgUpdate
     minAbsoluteSTScore 4.0;										Minimum absolute ST-score for extracting new feature patch
     minTimeBetweenPatchUpdate 1.0;								Minimum time between new multilevel patch extrection [s]
     fastDetectionThreshold 5;									Fast corner detector treshold while adding new feature
+    use16bitFastDetection 1;                                    Use custom FAST detection method that operates on 16bit data
     alignConvergencePixelRange 10;								Assumed convergence range for image alignment (gets scaled with the level) [pixels]
     alignCoverageRatio 2;										How many sigma of the uncertainty should be covered in the adaptive alignement
     alignMaxUniSample 1;										Maximal number of alignment seeds on one side -> total number of sample = 2n+1. Carefull can get very costly if diverging!
